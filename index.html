@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DermaProtego — Skin Health Scanner</title>
-
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Root color palette */
     :root {
       --primary: #6c63ff;
       --accent: #ff6584;
@@ -15,8 +14,6 @@
       --text: #1c1c1c;
       --muted: #6b7c93;
     }
-
-    /* Reset & body */
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -28,21 +25,32 @@
       align-items: center;
       padding: 20px;
     }
-
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 10px 0;
+    }
+    header p {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: auto;
+    }
     h2 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 700;
       margin: 20px 0 15px;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      transition: 0.3s ease;
     }
-
-    h2:hover {
-      transform: scale(1.05);
-    }
-
     .card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -50,13 +58,13 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       margin: 15px 0;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      max-width: 650px;
+      width: 100%;
     }
-
     .card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 24px rgba(0,0,0,0.15);
     }
-
     button {
       padding: 12px 24px;
       font-size: 16px;
@@ -70,18 +78,10 @@
       color: white;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(0,0,0,0.2);
     }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-      background: var(--accent);
-    }
-
     #webcam-container {
       margin: 15px auto;
       width: 100%;
@@ -90,20 +90,12 @@
       overflow: hidden;
       background: linear-gradient(180deg, #ffffff, #f7f8ff);
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-      transition: 0.3s ease;
     }
-
     #webcam-container canvas {
       width: 100% !important;
       height: auto !important;
       border-radius: 16px;
-      transition: transform 0.3s ease;
     }
-
-    #webcam-container:hover canvas {
-      transform: scale(1.02);
-    }
-
     #label-container {
       margin-top: 12px;
       font-size: 16px;
@@ -112,7 +104,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     #label-container div {
       padding: 6px 10px;
       border-radius: 12px;
@@ -120,25 +111,33 @@
       background: linear-gradient(90deg, #e0e5ff, #fef1f5);
       width: 80%;
       transition: 0.3s ease;
+      text-align: center;
     }
-
     #label-container div:hover {
       transform: scale(1.05);
       background: linear-gradient(90deg, var(--primary), var(--accent));
       color: white;
     }
-
-    @media (max-width: 480px) {
-      h2 { font-size: 1.7rem; }
-      button { padding: 10px 18px; font-size: 14px; }
+    footer {
+      margin-top: 30px;
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
     }
-
   </style>
 </head>
 <body>
-  <h2>DermaProtego</h2>
+  <header>
+    <h1>DermaProtego</h1>
+    <p>Your AI-powered assistant for skin health awareness and early detection support.  
+       Remember: this tool is for educational purposes only, not a substitute for a doctor’s consultation.</p>
+  </header>
 
+  <!-- Camera Section -->
   <div class="card">
+    <h2>Scan Your Skin</h2>
+    <p>Use your camera to detect skin lesion patterns with our AI model.</p>
     <button type="button" onclick="init()">Start Camera</button>
     <button type="button" onclick="stopCamera()">Stop Camera</button>
   </div>
@@ -146,12 +145,29 @@
   <div id="webcam-container" class="card"></div>
   <div id="label-container" class="card"></div>
 
+  <!-- Awareness Section -->
+  <div class="card">
+    <h2>Skin Cancer Awareness</h2>
+    <p>Skin cancer is one of the most common cancers worldwide. Early detection is critical, and most cases are preventable with healthy habits.</p>
+    <ul>
+      <li>🌞 Use sunscreen daily, even on cloudy days.</li>
+      <li>👒 Wear hats, sunglasses, and protective clothing.</li>
+      <li>🚫 Avoid tanning beds and long sun exposure.</li>
+      <li>🔍 Perform regular self-checks for new or changing moles.</li>
+      <li>🩺 See a dermatologist for routine checkups.</li>
+    </ul>
+  </div>
+
+  <footer>
+    ⚠️ Disclaimer: This app does not provide medical advice. Always consult a healthcare professional for diagnosis and treatment.
+  </footer>
+
   <!-- TensorFlow.js + Teachable Machine -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
   <script>
-    const URL = "./";  // model files are in same folder
+    const URL = "./"; // assumes model files are in same folder
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
