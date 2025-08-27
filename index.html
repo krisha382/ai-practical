@@ -1,109 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DermaProtego</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DermaProtego — Skin Health Scanner</title>
 
   <style>
+    /* Root color palette */
+    :root {
+      --primary: #6c63ff;
+      --accent: #ff6584;
+      --bg1: #f0f2f8;
+      --card-bg: #ffffff;
+      --text: #1c1c1c;
+      --muted: #6b7c93;
+    }
+
+    /* Reset & body */
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
-      padding: 0;
-      background: #f4f4f4;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f2f8, #e0e5f8);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
+
     h2 {
-      margin: 20px 0 10px;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 20px 0 15px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: 0.3s ease;
     }
+
+    h2:hover {
+      transform: scale(1.05);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin: 15px 0;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+
     button {
       padding: 12px 24px;
-      font-size: 18px;
+      font-size: 16px;
+      font-weight: 600;
       border: none;
-      border-radius: 8px;
-      background: #007bff;
-      color: white;
+      border-radius: 50px;
       cursor: pointer;
-      margin: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin: 8px;
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
     button:active {
-      background: #0056b3;
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      background: var(--accent);
     }
+
     #webcam-container {
-      margin: 10px auto;
+      margin: 15px auto;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffffff, #f7f8ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: 0.3s ease;
     }
-    canvas {
+
+    #webcam-container canvas {
       width: 100% !important;
       height: auto !important;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      transition: transform 0.3s ease;
     }
+
+    #webcam-container:hover canvas {
+      transform: scale(1.02);
+    }
+
     #label-container {
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
     #label-container div {
-      padding: 6px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      margin: 4px 0;
+      background: linear-gradient(90deg, #e0e5ff, #fef1f5);
+      width: 80%;
+      transition: 0.3s ease;
     }
+
+    #label-container div:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    @media (max-width: 480px) {
+      h2 { font-size: 1.7rem; }
+      button { padding: 10px 18px; font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
   <h2>DermaProtego</h2>
-  <button type="button" onclick="init()">Start Camera</button>
-  <div id="webcam-container"></div>
-  <div id="label-container"></div>
+
+  <div class="card">
+    <button type="button" onclick="init()">Start Camera</button>
+    <button type="button" onclick="stopCamera()">Stop Camera</button>
+  </div>
+
+  <div id="webcam-container" class="card"></div>
+  <div id="label-container" class="card"></div>
 
   <!-- TensorFlow.js + Teachable Machine -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
-  <script type="text/javascript">
+  <script>
     const URL = "./";  // model files are in same folder
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
 
+      try {
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
+      } catch (e) {
+        alert("Model failed to load. Check the files.");
+        console.error(e);
+        return;
+      }
 
-        // Full screen width webcam (up to 400px)
-        const flip = true;
-        webcam = new tmImage.Webcam(400, 400, flip);
-        await webcam.setup();
-        await webcam.play();
-        window.requestAnimationFrame(loop);
+      const flip = true;
+      webcam = new tmImage.Webcam(400, 400, flip);
+      await webcam.setup();
+      await webcam.play();
+      window.requestAnimationFrame(loop);
 
-        document.getElementById("webcam-container").innerHTML = "";
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
+      const container = document.getElementById("webcam-container");
+      container.innerHTML = "";
+      container.appendChild(webcam.canvas);
 
-        labelContainer = document.getElementById("label-container");
-        labelContainer.innerHTML = "";
-        for (let i = 0; i < maxPredictions; i++) {
-            labelContainer.appendChild(document.createElement("div"));
-        }
+      labelContainer = document.getElementById("label-container");
+      labelContainer.innerHTML = "";
+      for (let i = 0; i < maxPredictions; i++) {
+        labelContainer.appendChild(document.createElement("div"));
+      }
     }
 
     async function loop() {
-        webcam.update();
-        await predict();
-        window.requestAnimationFrame(loop);
+      webcam.update();
+      await predict();
+      window.requestAnimationFrame(loop);
     }
 
     async function predict() {
-        const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(1) + "%";
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-        }
+      const prediction = await model.predict(webcam.canvas);
+      for (let i = 0; i < maxPredictions; i++) {
+        const classPrediction =
+          prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(1) + "%";
+        labelContainer.childNodes[i].innerHTML = classPrediction;
+      }
+    }
+
+    function stopCamera() {
+      if (webcam) {
+        webcam.stop();
+      }
     }
   </script>
 </body>
 </html>
-
-
